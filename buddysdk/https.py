@@ -5,10 +5,10 @@ import threading
 import time
 import uuid
 
+import buddy as module
 from connection import Connection
 from buddy_events import BuddyEvents
-from settings import Settings
-import buddy
+import settings
 
 
 class Https(object):
@@ -28,13 +28,13 @@ class Https(object):
 
     @classmethod
     def init(cls, app_id, app_key):
-        buddy.events = BuddyEvents()
+        module.events = BuddyEvents()
 
-        buddy.settings = Settings(app_id, app_key)
+        module.settings = settings.Settings(app_id, app_key)
 
-        buddy.https_client = cls(buddy.events, buddy.settings)
+        module.https_client = cls(module.events, module.settings)
 
-        return buddy.https_client
+        return module.https_client
 
     @property
     def events(self):

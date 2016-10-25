@@ -1,7 +1,8 @@
 ﻿import unittest
 
-from access_token import AccessToken
-from settings import Settings
+import buddy
+from buddysdk.access_token import AccessToken
+from buddysdk.settings import Settings
 from test_base import TestBase
 
 

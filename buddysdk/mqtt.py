@@ -12,10 +12,10 @@ if sys.version_info.major < 3:
 else:
     from urllib.parse import urlparse
 
-import buddy
-from settings import Settings
+import buddy as module
 from buddy_events import BuddyEvents
-import https
+from https import Https
+from settings import Settings
 
 
 class RootLevels(IntEnum):
@@ -96,17 +96,17 @@ class Mqtt(object):
 
     @classmethod
     def init(cls, app_id, app_key):
-        buddy.events = BuddyEvents()
+        module.events = BuddyEvents()
 
-        buddy.settings = Settings(app_id, app_key)
+        module.settings = Settings(app_id, app_key)
 
-        buddy.https_client = https.Https(buddy.events, buddy.settings)
+        module.https_client = Https(module.events, module.settings)
 
-        buddy.mqtt_client = MqttEvents()
+        module.mqtt_client = MqttEvents()
 
-        buddy.mqtt_client = cls(buddy.events, buddy.mqtt_client, buddy.settings, buddy.https_client)
+        module.mqtt_client = cls(module.events, module.mqtt_client, module.settings, module.https_client)
 
-        return buddy.mqtt_client
+        return module.mqtt_client
 
     def __on_disconnect(self, client, userdata, rc):
         self._events.connection_changed.on_change(userdata, rc)

@@ -1,9 +1,7 @@
 ﻿import mprop
 
-from buddy_events import BuddyEvents
-import https as https_module
-import mqtt as mqtt_module
-from settings import Settings
+import https as https_import
+import mqtt as mqtt_import
 
 
 https_client = None
@@ -15,12 +13,12 @@ mqtt_events = None
 
 @property
 def https(module):
-    return https_module.Https.init if module.https_client is None else module.https_client
+    return https_import.Https.init if module.https_client is None else module.https_client
 
 
 @property
 def mqtt(module):
-    return mqtt_module.Mqtt.init if module.mqtt_client is None else module.mqtt_client
+    return mqtt_import.Mqtt.init if module.mqtt_client is None else module.mqtt_client
 
 
 @property

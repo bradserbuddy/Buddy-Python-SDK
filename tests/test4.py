@@ -2,21 +2,22 @@
 import unittest
 
 import buddy
-from https import Https
-from settings import Settings
+from buddysdk.buddy_events import BuddyEvents
+from buddysdk.https import Https
+from buddysdk.settings import Settings
 from test_base import TestBase
 
 
 class Test4(TestBase):
 
-    @mock.patch("https.Settings")
+    @mock.patch("settings.Settings")
     def test_register_device_us(self, settings_mock):
         settings_mock.return_value = Settings(TestBase.US_app_id, TestBase.US_app_key)
         self.setup_with_bad_tokens(settings_mock.return_value)
 
         self._register_device(self, TestBase.US_app_id, TestBase.US_app_key, "https://api")
 
-    @mock.patch("https.Settings")
+    @mock.patch("settings.Settings")
     def test_register_device_eu(self, settings_mock):
         settings_mock.return_value = Settings(TestBase.EU_app_id, TestBase.EU_app_key)
         self.setup_with_bad_tokens(settings_mock.return_value)
@@ -40,7 +41,11 @@ class Test4(TestBase):
         # TODO: to run in Python Tools for VS, change to "tests\cpuinfo"
         hardware_info_file_name_mock.return_value = "cpuinfo"
 
-        client = buddy.https(TestBase.US_app_id, TestBase.US_app_key)
+        events = BuddyEvents()
+
+        settings = Settings(TestBase.US_app_id, TestBase.US_app_key)
+
+        client = Https(events, settings)
 
         client.get_access_token_string()
 

@@ -3,8 +3,8 @@ import time
 import unittest
 
 import buddy
-from connection import Connection
-from settings import Settings
+from buddysdk.connection import Connection
+from buddysdk.settings import Settings
 from test_base import TestBase
 
 

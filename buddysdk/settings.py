@@ -3,7 +3,6 @@ import re
 import os
 
 from access_token import AccessToken
-from events import Events
 
 
 class Settings(object):

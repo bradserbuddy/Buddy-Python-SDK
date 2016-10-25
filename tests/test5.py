@@ -2,7 +2,7 @@
 import unittest
 
 import buddy
-from https import Https
+from buddysdk.https import Https
 from test_base import TestBase
 
 

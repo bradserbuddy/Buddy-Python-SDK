@@ -1,8 +1,12 @@
 ﻿import unittest
 
-from buddy_events import BuddyEvents
-from https import Https
-from settings import Settings
+
+import sys
+if sys.version_info.major < 3:
+    from buddysdk import buddy
+from buddysdk.buddy_events import BuddyEvents
+from buddysdk.https import Https
+from buddysdk.settings import Settings
 from test_base import TestBase
 
 
