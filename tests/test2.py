@@ -1,6 +1,6 @@
 ﻿import unittest
 
-import buddy
+import buddysdk.buddy as buddy
 from test_base import TestBase
 
 

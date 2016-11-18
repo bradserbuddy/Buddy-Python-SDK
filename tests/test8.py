@@ -2,8 +2,8 @@ import json
 import time
 import unittest
 
-import buddy
-import mqtt
+import buddysdk.buddy as buddy
+from buddysdk import mqtt
 from test_base import TestBase
 
 
@@ -38,13 +38,19 @@ class Test8(TestBase):
 
         self.assertIsNotNone(client)
 
-        telemetry_topic = mqtt.Topic.create(mqtt.RootLevels.telemetry, "telemetry_config")
+        telemetry_topic = mqtt.Topic.create(mqtt.RootLevels.telemetry, "python_sdk_testing_telemetry_config")
 
-        payload = json.dumps({"data": {"value": 1}})
+        payload = json.dumps({"data": {"value": 2}})
 
-        message_info = buddy.mqtt.publish(telemetry_topic, payload)
+        # TODO: mqtt.Qos.at_least_once is temporarily required for MQTT telemetry publication
+        message_info = buddy.mqtt.publish(telemetry_topic, payload, mqtt.Qos.at_least_once)
+
+        # TODO: wait to receive the PUBACK. This should not be necessary once Qos.at_most_once is allowed for MQTT telemetry publication
+        time.sleep(2)
 
         self.assertIsNotNone(message_info)
+
+        print(message_info)
 
 
 class PublishReceivedLogger(object):

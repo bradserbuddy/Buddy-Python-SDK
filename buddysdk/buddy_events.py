@@ -1,12 +1,12 @@
-from events import Events
+import events
 
 
 class BuddyEvents(object):
 
     def __init__(self):
-        self._service_exception = Events()
-        self._user_authentication_needed = Events()
-        self._connection_changed = Events()
+        self._service_exception = events.Events()
+        self._user_authentication_needed = events.Events()
+        self._connection_changed = events.Events()
 
     @property
     def service_exception(self):

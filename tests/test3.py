@@ -1,8 +1,7 @@
 ﻿import unittest
 
-import buddy
-from buddysdk.access_token import AccessToken
-from buddysdk.settings import Settings
+import buddysdk.access_token
+import buddysdk.settings
 from test_base import TestBase
 
 
@@ -15,7 +14,7 @@ class Test3(TestBase):
     _access_token = "at"
 
     def test_Settings_empty(self):
-        settings = Settings(Test3._app_id, Test3._app_key)
+        settings = buddysdk.settings.Settings(Test3._app_id, Test3._app_key)
         at = settings.access_token_string
         self.assertEqual(at, None)
         self.assertEqual(settings.service_root, Test3._default_service_root)
@@ -30,11 +29,11 @@ class Test3(TestBase):
 
     def access_token_base(self, days):
         datetime = self.datetime_from_days(days)
-        at = AccessToken([Test3._access_token, str(self.ticks_from_datetime(datetime))])
+        at = buddysdk.access_token.AccessToken([Test3._access_token, str(self.ticks_from_datetime(datetime))])
         return at
 
     def test_Settings_access_token(self):
-        settings = Settings(Test3._app_id, Test3._app_key)
+        settings = buddysdk.settings.Settings(Test3._app_id, Test3._app_key)
 
         json = {"accessToken": Test3._access_token,
                 "accessTokenExpires": self.future_javascript_access_token_expires(),
@@ -45,7 +44,7 @@ class Test3(TestBase):
         self.assertEqual(settings.access_token_string, Test3._access_token)
 
     def test_Settings_access_token_expired(self):
-        settings = Settings(Test3._app_id, Test3._app_key)
+        settings = buddysdk.settings.Settings(Test3._app_id, Test3._app_key)
 
         json = {"accessToken": Test3._access_token,
                 "accessTokenExpires": self.past_javascript_access_token_expires(),
@@ -60,7 +59,7 @@ class Test3(TestBase):
         # pre-load Settings with a different test
         self.test_Settings_access_token()
 
-        settings = Settings(Test3._app_id, Test3._app_key)
+        settings = buddysdk.settings.Settings(Test3._app_id, Test3._app_key)
 
         self.assertEqual(settings.access_token_string, Test3._access_token)
         self.assertEqual(settings.service_root, Test3._service_root)

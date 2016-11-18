@@ -1,24 +1,18 @@
 ﻿import unittest
 
-
-import sys
-if sys.version_info.major < 3:
-    from buddysdk import buddy
-from buddysdk.buddy_events import BuddyEvents
-from buddysdk.https import Https
-from buddysdk.settings import Settings
-from test_base import TestBase
+import buddysdk
+import test_base
 
 
-class Test1(TestBase):
+class Test1(unittest.TestCase):
 
     def test_Https(self):
-        settings = Settings(TestBase.US_app_id, TestBase.US_app_key)
-        events = BuddyEvents()
-        client = Https(events, settings)
+        settings = buddysdk.settings.Settings(test_base.TestBase.US_app_id, test_base.TestBase.US_app_key)
+        events = buddysdk.buddy_events.BuddyEvents()
+        client = buddysdk.https.Https(events, settings)
         self.assertIsNotNone(client)
-        self.assertIs(settings.app_id, TestBase.US_app_id)
-        self.assertIs(settings.app_key, TestBase.US_app_key)
+        self.assertIs(settings.app_id, test_base.TestBase.US_app_id)
+        self.assertIs(settings.app_key, test_base.TestBase.US_app_key)
 
 
 if __name__ == '__main__':

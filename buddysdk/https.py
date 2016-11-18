@@ -5,10 +5,9 @@ import threading
 import time
 import uuid
 
-import buddy as module
-from connection import Connection
-from buddy_events import BuddyEvents
-import settings
+import buddysdk.connection
+import buddysdk.buddy_events
+import buddysdk.settings
 
 
 class Https(object):
@@ -16,25 +15,25 @@ class Https(object):
     status_name = u"status"
     result_name = u"result"
 
-    def __init__(self, events, settings):
+    def __init__(self, events, settings_value):
         self._events = events
-        self._settings = settings
+        self._settings = settings_value
 
         self._session = requests.Session()
         self._session.auth = Auth(self)
 
         self._connection_retry = None
-        self._connection_level = Connection.on
+        self._connection_level = buddysdk.connection.Connection.on
 
     @classmethod
     def init(cls, app_id, app_key):
-        module.events = BuddyEvents()
+        events = buddysdk.buddy_events.BuddyEvents()
 
-        module.settings = settings.Settings(app_id, app_key)
+        settings = buddysdk.settings.Settings(app_id, app_key)
 
-        module.https_client = cls(module.events, module.settings)
+        https_client = cls(events, settings)
 
-        return module.https_client
+        return [events, settings, https_client]
 
     @property
     def events(self):
@@ -113,7 +112,8 @@ class Https(object):
     def put(self, path, dictionary):
         return self.__handle_dictionary_request(self._session.put, path, dictionary)
 
-    def create_user(self, user_name, password, first_name=None, last_name=None, email=None, gender=None, date_of_birth=None, tag=None):
+    def create_user(self, user_name, password, first_name=None, last_name=None, email=None,
+                    gender=None, date_of_birth=None, tag=None):
         response = self.__handle_dictionary_request(self._session.post, "/users", {
             "username": user_name,
             "password": password,
@@ -151,20 +151,20 @@ class Https(object):
     def __handle_parameters_request(self, verb, path, parameters=None):
         self.__handle_last_location(parameters)
 
-        def closure(settings):
-            return verb(settings.service_root + path, params=parameters)
+        def closure(settings_value):
+            return verb(settings_value.service_root + path, params=parameters)
 
         return self.__handle_request(closure)
 
-    def __handle_dictionary_request(self, verb, path, dictionary, file=None):
+    def __handle_dictionary_request(self, verb, path, dictionary, file_value=None):
         self.__handle_last_location(dictionary)
 
-        def closure(settings):
-            url = settings.service_root + path
-            if file is None:
+        def closure(settings_value):
+            url = settings_value.service_root + path
+            if file_value is None:
                 return verb(url, json=dictionary)
             else:
-                return verb(url, json=dictionary, files={"data": ("data",) + file})
+                return verb(url, json=dictionary, files={"data": ("data",) + file_value})
 
         return self.__handle_request(closure)
 
@@ -179,8 +179,6 @@ class Https(object):
             return self.__handle_request_3(closure)
 
     def __handle_request_2(self, closure):
-        response = None
-
         try:
             response = closure(self.settings)
         except requests.RequestException as exception:
@@ -193,8 +191,6 @@ class Https(object):
             return self.__handle_response(response)
 
     def __handle_request_3(self, closure):
-        response = None
-
         try:
             response = closure(self.settings)
         except requests.RequestException as exception:
@@ -207,10 +203,11 @@ class Https(object):
             return self.__handle_response(response)
 
     def __handle_connection_exception(self, exception):
-        self.__set_connection_level(Connection.off)
+        self.__set_connection_level(buddysdk.connection.Connection.off)
 
         if self._connection_retry is None:
-            self._connection_retry = threading.Thread(target=self.__connection_retry_method, args=(self._settings.service_root, self.__reset_retry))
+            self._connection_retry = threading.Thread(target=Https.__connection_retry_method,
+                                                      args=(self._settings.service_root, self.__reset_retry))
             self._connection_retry.start()
 
         return self.__handle_exception(exception)
@@ -238,10 +235,11 @@ class Https(object):
         return response_dict
 
     def __reset_retry(self):
-        self.__set_connection_level(Connection.on)
+        self.__set_connection_level(buddysdk.connection.Connection.on)
         self._connection_retry = None
 
-    def __connection_retry_method(self, service_root, reset_retry):
+    @staticmethod
+    def __connection_retry_method(service_root, reset_retry):
         successful = False
 
         try:

@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime as dt
 
 
 class AccessToken(object):
@@ -12,7 +12,7 @@ class AccessToken(object):
 
     @property
     def token(self):
-        if self._token is None or self._token is "" or self._expires <= datetime.utcnow():
+        if self._token is None or self._token is "" or self._expires <= dt.datetime.utcnow():
             return None
         else:
             return self._token
@@ -23,11 +23,11 @@ class AccessToken(object):
 
     def __set_expires(self, value):
         if value is None or value is "":
-            self._expires = datetime.utcfromtimestamp(0)
+            self._expires = dt.datetime.utcfromtimestamp(0)
         else:
             ticks = int(float(value))
             timestamp = AccessToken.__timestamp_from_ticks(ticks)
-            self._expires = datetime.utcfromtimestamp(timestamp)
+            self._expires = dt.datetime.utcfromtimestamp(timestamp)
 
     @staticmethod
     def __timestamp_from_ticks(ticks):

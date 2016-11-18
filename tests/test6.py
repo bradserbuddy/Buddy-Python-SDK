@@ -2,7 +2,7 @@ import logging
 import time
 import unittest
 
-import buddy
+import buddysdk.buddy as buddy
 from buddysdk.connection import Connection
 from buddysdk.settings import Settings
 from test_base import TestBase

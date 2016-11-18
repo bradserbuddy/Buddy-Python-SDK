@@ -1,7 +1,6 @@
 ﻿import mprop
 
-import https as https_import
-import mqtt as mqtt_import
+import buddysdk
 
 
 https_client = None
@@ -13,12 +12,39 @@ mqtt_events = None
 
 @property
 def https(module):
-    return https_import.Https.init if module.https_client is None else module.https_client
+    if module.https_client is None:
+        def init_https(app_id_value, app_key_value):
+            objects = buddysdk.https.Https.init(app_id_value, app_key_value)
+
+            module.events = objects[0]
+            module.settings = objects[1]
+            module.https_client = objects[2]
+
+            return module.https_client
+
+        return init_https
+    else:
+        return module.https_client
 
 
 @property
 def mqtt(module):
-    return mqtt_import.Mqtt.init if module.mqtt_client is None else module.mqtt_client
+    if module.mqtt_client is None:
+
+        def init_mqtt(app_id_value, app_key_value):
+            objects = buddysdk.mqtt.Mqtt.init(app_id_value, app_key_value)
+
+            module.events = objects[0]
+            module.mqtt_events = objects[1]
+            module.settings = objects[2]
+            module.https_client = objects[3]
+            module.mqtt_client = objects[4]
+
+            return module.mqtt_client
+
+        return init_mqtt
+    else:
+        return module.mqtt_client
 
 
 @property
@@ -66,9 +92,9 @@ def user_authentication_needed(module):
     return module.events.user_authentication_needed
 
 
-def init(module, app_id, app_key):
+def init(module, app_id_value, app_key):
     # mqtt depends on https, so leverage mqtt's init
-    module.mqtt(app_id, app_key)
+    module.mqtt(app_id_value, app_key)
 
 
 mprop.init()

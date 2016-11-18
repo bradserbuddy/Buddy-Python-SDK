@@ -1,14 +1,15 @@
-﻿import sys
-import time
+﻿import time
 from curses_check_for_keypress import CheckForKeypress
 
 # TODO: Make sure you are using the correct GPIO package.
 
-# The following import is used by the fakeRPiGPIO package, for testing outside of Raspberry Pi.
-# import RPi.GPIO as GPIO
+# TODO: The following import is used by the fakeRPiGPIO package, for testing outside of Raspberry Pi.
+import RPi.GPIO as GPIO
 
-# The following import is used by the RPi.GPIO package, for testing on a Raspberry Pi.
-from RPi import GPIO
+# TODO: The following import is used by the RPi.GPIO package, for testing on a Raspberry Pi.
+#from RPi import GPIO
+
+import buddysdk.buddy as buddy
 
 
 GPIO.VERBOSE = False
@@ -19,16 +20,12 @@ channel_list = [4]
 
 GPIO.setup(channel_list, GPIO.IN, GPIO.PUD_DOWN)
 
-sys.path.append("../SDK")
-sys.path.append("../SDK/buddysdk")
-
-from buddysdk import buddy
 
 # TODO: Go to http://buddyplatform.com to get an app ID and app key.
 buddy.init("<Your App ID>", "<Your App Key>")
 
-# An initial PUT must be done to configure your app's telemetry. See https://dev.buddyplatform.com/docs/IoT%20Telemetry#ConfigureTelemetry for more details.
-buddy.put("/telemetry/RaspberryPi", {})
+# TODO: An initial PUT must be done to configure your app's telemetry. See https://dev.buddyplatform.com/docs/IoT%20Telemetry#ConfigureTelemetry for more details.
+buddy.https.put("/telemetry/RaspberryPi", {})
 
 c = CheckForKeypress('Buddy Raspberry Pi SDK Sample', test_mode=True)
 
@@ -38,11 +35,11 @@ while c.input() is None:
 
     data = {"pins": dict(zip(channel_list, outputs))}
 
-    print "GPIO status: " + str(data) + "\r"
+    print("GPIO status: " + str(data) + "\r")
 
-    response = buddy.post("/telemetry/RaspberryPi", {"data": data})
+    response = buddy.https.post("/telemetry/RaspberryPi", {"data": data})
 
-    print "Telemetry response: " + str(response) + "\r"
+    print("Telemetry response: " + str(response) + "\r")
 
     time.sleep(2)
 

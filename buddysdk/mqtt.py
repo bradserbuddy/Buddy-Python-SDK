@@ -12,10 +12,9 @@ if sys.version_info.major < 3:
 else:
     from urllib.parse import urlparse
 
-import buddy as module
-from buddy_events import BuddyEvents
-from https import Https
-from settings import Settings
+import buddysdk.buddy_events
+import buddysdk.https
+import buddysdk.settings
 
 
 class RootLevels(IntEnum):
@@ -36,7 +35,7 @@ class Topic(object):
     @classmethod
     def create(cls, root_level, levels=None):
         parsed_root_level = None
-        parsed_levels = None;
+        parsed_levels = None
 
         if isinstance(root_level, basestring):
             split_levels = root_level.split("/")
@@ -87,40 +86,40 @@ class MqttEvents(object):
 
 
 class Mqtt(object):
-    def __init__(self, events, mqtt_events, settings, https):
+    def __init__(self, events, mqtt_events, settings_value, https_value):
         self._events = events
         self._mqtt_events = mqtt_events
-        self._https = https
-        self._settings = settings
+        self._https = https_value
+        self._settings = settings_value
         self._client = None
 
     @classmethod
     def init(cls, app_id, app_key):
-        module.events = BuddyEvents()
+        events = buddysdk.buddy_events.BuddyEvents()
 
-        module.settings = Settings(app_id, app_key)
+        settings = buddysdk.settings.Settings(app_id, app_key)
 
-        module.https_client = Https(module.events, module.settings)
+        https_client = buddysdk.https.Https(events, settings)
 
-        module.mqtt_client = MqttEvents()
+        mqtt_events = MqttEvents()
 
-        module.mqtt_client = cls(module.events, module.mqtt_client, module.settings, module.https_client)
+        mqtt_client = cls(events, mqtt_events, settings, https_client)
 
-        return module.mqtt_client
+        return [events, mqtt_events, settings, https_client, mqtt_client]
 
-    def __on_disconnect(self, client, userdata, rc):
-        self._events.connection_changed.on_change(userdata, rc)
+    def __on_disconnect(self, client, user_data, rc):
+        self._events.connection_changed.on_change(user_data, rc)
 
-    def __on_message(self, client, userdata, msg):
-        self._mqtt_events.publish_received.on_change(userdata, msg)
+    def __on_message(self, client, user_data, msg):
+        self._mqtt_events.publish_received.on_change(user_data, msg)
 
-    def __on_publish(self, client, userdata, mid):
-        self._mqtt_events.published.on_change(userdata, mid)
+    def __on_publish(self, client, user_data, mid):
+        self._mqtt_events.published.on_change(user_data, mid)
 
-    def __on_debug_connect(self, client, userdata, flags, rc):
-        print(userdata)
+    def __on_debug_connect(self, client, user_data, flags, rc):
+        print(user_data)
 
-    def __on_debug_log(self, client, userdata, level, buf):
+    def __on_debug_log(self, client, user_data, level, buf):
         print(buf)
 
     def connect(self):
@@ -138,7 +137,8 @@ class Mqtt(object):
             self._client.on_log = self.__on_debug_log
 
             try:
-                self._client.connect("co-us.buddyplatform.com", 8883)
+                # TODO: Non-secured connections are temporarily required for MQTT
+                self._client.connect("co.us.buddyplatform.com", 1883)
 
                 self._client.loop_start()
 

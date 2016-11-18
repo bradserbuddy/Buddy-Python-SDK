@@ -1,7 +1,7 @@
 ﻿import logging
 import unittest
 
-import buddy
+import buddysdk.buddy as buddy
 from buddysdk.https import Https
 from test_base import TestBase
 

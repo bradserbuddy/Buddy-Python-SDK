@@ -2,65 +2,50 @@ import mock
 import time
 import unittest
 
-import buddy
-from buddysdk.settings import Settings
+import buddysdk.buddy as buddy
 from test_base import TestBase
 
 
 class Test7(TestBase):
 
-    @mock.patch('settings.Settings')
-    def test_create_user(self, settings_mock):
-        settings_mock.return_value = Settings(TestBase.US_app_id, TestBase.US_app_key)
-
-        self.setup_with_bad_tokens(settings_mock.return_value)
-
-        settings_mock.return_value.last_location = None
-
+    def test_create_user(self, ):
         buddy.https(TestBase.US_app_id, TestBase.US_app_key)
 
         users = buddy.https.get("/users", {})
         self.assertIsNotNone(users)
 
-        device_token = settings_mock.return_value.access_token_string
+        device_token = buddy.settings.access_token_string
         self.assertIsNotNone(device_token)
 
         user_response = self.create_test_user()
         self.assertIsNotNone(user_response)
 
-        user_token = settings_mock.return_value.access_token_string
+        user_token = buddy.settings.access_token_string
         self.assertIsNotNone(user_token)
 
         self.assertNotEqual(device_token, user_token)
 
         self.assertEqual(buddy.current_user_id, user_response["result"]["id"])
 
-    @mock.patch('settings.Settings')
-    def test_create_logout_login_user(self, settings_mock):
-        settings_mock.return_value = Settings(TestBase.US_app_id, TestBase.US_app_key)
-
-        self.setup_with_bad_tokens(settings_mock.return_value)
-
-        settings_mock.return_value.last_location = None
-
+    def test_create_logout_login_user(self):
         buddy.https(TestBase.US_app_id, TestBase.US_app_key)
 
         users_response = buddy.https.get("/users", {})
         self.assertIsNotNone(users_response)
 
-        device_token = settings_mock.return_value.access_token_string
+        device_token = buddy.settings.access_token_string
         self.assertIsNotNone(device_token)
 
         user_name = self.get_test_user_name()
         user1_response = self.create_test_user(user_name)
         self.assertIsNotNone(user1_response)
 
-        user_token = settings_mock.return_value.access_token_string
+        user_token = buddy.settings.access_token_string
         self.assertIsNotNone(user_token)
 
         buddy.https.logout_user()
 
-        device_token_2 = settings_mock.return_value.access_token_string
+        device_token_2 = buddy.settings.access_token_string
 
         self.assertEqual(device_token, device_token_2)
         self.assertNotEqual(device_token, user_token)
@@ -82,12 +67,8 @@ class Test7(TestBase):
         self.assertIsNotNone(response)
         self.assertIsNotNone(response["result"]["signedUrl"])
 
-    @mock.patch('settings.Settings')
-    def test_auth_error(self, settings_mock):
-        settings_mock.return_value = Settings(TestBase.US_app_id, TestBase.US_app_key)
-        self.setup_with_bad_tokens(settings_mock.return_value)
-
-        buddy.https(TestBase.US_app_id, TestBase.US_app_key, )
+    def test_auth_error(self):
+        buddy.https(TestBase.US_app_id, TestBase.US_app_key)
 
         response = buddy.https.get("/pictures", {})
         self.assertIsNotNone(response)

@@ -2,7 +2,7 @@
 import re
 import os
 
-from access_token import AccessToken
+import buddysdk.access_token
 
 
 class Settings(object):
@@ -62,7 +62,7 @@ class Settings(object):
 
     @property
     def device_token(self):
-        return AccessToken(self.__get_access_token(Settings._device_token_name))
+        return buddysdk.access_token.AccessToken(self.__get_access_token(Settings._device_token_name))
 
     def set_device_token(self, response):
         self.__set_access_token(Settings._device_token_name, response)
@@ -93,7 +93,7 @@ class Settings(object):
 
     @property
     def user_token(self):
-        return AccessToken(self.__get_access_token(Settings._user_token_name))
+        return buddysdk.access_token.AccessToken(self.__get_access_token(Settings._user_token_name))
 
     @property
     def user_id(self):

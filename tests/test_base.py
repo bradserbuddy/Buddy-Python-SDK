@@ -5,8 +5,7 @@ import os
 from uuid import uuid4
 import unittest
 
-import buddy
-from settings import Settings
+import buddysdk
 
 
 class TestBase(unittest.TestCase):
@@ -19,17 +18,17 @@ class TestBase(unittest.TestCase):
 
     def setUp(self):
         try:
-            os.remove(Settings.buddy_cfg_name)
+            os.remove(buddysdk.settings.Settings.buddy_cfg_name)
         finally:
             self.reset_module()
             return
 
     def reset_module(self):
-        buddy.https_client = None
-        buddy.mqtt_client = None
-        buddy.settings = None
-        buddy.events = None
-        buddy.mqtt_events = None
+        buddysdk.buddy.https_client = None
+        buddysdk.buddy.mqtt_client = None
+        buddysdk.buddy.settings = None
+        buddysdk.buddy.events = None
+        buddysdk.buddy.mqtt_events = None
 
     def setup_with_bad_tokens(self, settings):
         settings.set_device_token({"accessToken": "bad device token",
@@ -65,7 +64,7 @@ class TestBase(unittest.TestCase):
         return round(timestamp * 1000)
 
     def create_test_user(self, user_name=None):
-        return buddy.https.create_user(self.get_test_user_name() if user_name is None else user_name,
+        return buddysdk.buddy.https.create_user(self.get_test_user_name() if user_name is None else user_name,
                                  self.get_test_user_password())
 
     def get_test_user_name(self):
